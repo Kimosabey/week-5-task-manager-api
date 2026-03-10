@@ -34,3 +34,11 @@ Common status codes to learn:
 - **req.body**: Data sent in the request body (used in POST/PUT).
 - **req.params**: Dynamic segments in URL (e.g., `:id` in `/tasks/:id`).
 - **req.query**: Query strings (e.g., `?status=completed` in `/tasks?status=completed`).
+
+## 6. Intro to Middleware
+Middleware are functions that run **between** the request and the response.
+- **express.json()**: A built-in middleware that allows Express to read JSON data from `req.body`. Without this, `req.body` will be `undefined`!
+
+```javascript
+app.use(express.json()); // Essential for POST/PUT requests
+```

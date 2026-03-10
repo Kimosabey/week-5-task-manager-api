@@ -2,18 +2,15 @@ const express = require('express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const taskRoutes = require('./routes/tasks');
+const logger = require('./middleware/logger');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
-
-// Logger Middleware
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
-});
+app.use(logger); // Using external logger middleware
 
 // Swagger Configuration
 const swaggerOptions = {
@@ -43,25 +40,15 @@ app.get('/', (req, res) => {
     res.send('<h1>Task Management API</h1><p>View documentation at <a href="/api-docs">/api-docs</a></p>');
 });
 
-// 404 Handler
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found'
-    });
-});
-
-// Global Error Handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: 'Something went wrong!',
-        error: err.message
-    });
-});
+// 404 & Error Handlers
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+    const ip = '10.10.20.122'; // Extracted from user's ipconfig
+    console.log(`\n🚀 Task Management API is LIVE!`);
+    console.log(`🏠 Local:            http://localhost:${PORT}`);
+    console.log(`🌐 Network (Interns): http://${ip}:${PORT}`);
+    console.log(`📚 Swagger Docs:      http://${ip}:${PORT}/api-docs\n`);
+    console.log(`--- Activity Logs ---`);
 });

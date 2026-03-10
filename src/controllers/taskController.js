@@ -22,6 +22,7 @@ const getNextId = () => tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1
  * Get all tasks
  */
 exports.getAllTasks = (req, res) => {
+    console.log(`[INFO] GET /tasks - Fetching all tasks. Count: ${tasks.length}`);
     res.status(200).json({
         success: true,
         data: tasks
@@ -32,9 +33,12 @@ exports.getAllTasks = (req, res) => {
  * Get single task by ID
  */
 exports.getTaskById = (req, res) => {
-    const task = tasks.find(t => t.id === parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    console.log(`[INFO] GET /tasks/${id} - Fetching task.`);
+    const task = tasks.find(t => t.id === id);
 
     if (!task) {
+        console.error(`[ERROR] Task ${id} not found.`);
         return res.status(404).json({
             success: false,
             message: `Task with ID ${req.params.id} not found`
@@ -52,8 +56,10 @@ exports.getTaskById = (req, res) => {
  */
 exports.createTask = (req, res) => {
     const { title, description } = req.body;
+    console.log(`[INFO] POST /tasks - Creating task: "${title}"`);
 
     if (!title) {
+        console.error(`[ERROR] Task creation failed: Missing title.`);
         return res.status(400).json({
             success: false,
             message: "Title is required"
@@ -69,6 +75,7 @@ exports.createTask = (req, res) => {
     };
 
     tasks.push(newTask);
+    console.log(`[SUCCESS] Task created with ID: ${newTask.id}`);
 
     res.status(201).json({
         success: true,
@@ -80,9 +87,12 @@ exports.createTask = (req, res) => {
  * Update task
  */
 exports.updateTask = (req, res) => {
-    const index = tasks.findIndex(t => t.id === parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    console.log(`[INFO] PUT /tasks/${id} - Updating task.`);
+    const index = tasks.findIndex(t => t.id === id);
 
     if (index === -1) {
+        console.error(`[ERROR] Update failed: Task ${id} not found.`);
         return res.status(404).json({
             success: false,
             message: `Task with ID ${req.params.id} not found`
@@ -97,6 +107,7 @@ exports.updateTask = (req, res) => {
     };
 
     tasks[index] = updatedTask;
+    console.log(`[SUCCESS] Task ${id} updated.`);
 
     res.status(200).json({
         success: true,
@@ -108,16 +119,20 @@ exports.updateTask = (req, res) => {
  * Delete task
  */
 exports.deleteTask = (req, res) => {
-    const index = tasks.findIndex(t => t.id === parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    console.log(`[INFO] DELETE /tasks/${id} - Deleting task.`);
+    const index = tasks.findIndex(t => t.id === id);
 
     if (index === -1) {
+        console.error(`[ERROR] Delete failed: Task ${id} not found.`);
         return res.status(404).json({
             success: false,
             message: `Task with ID ${req.params.id} not found`
         });
     }
 
-    tasks = tasks.filter(t => t.id !== parseInt(req.params.id));
+    tasks = tasks.filter(t => t.id !== id);
+    console.log(`[SUCCESS] Task ${id} deleted.`);
 
     res.status(200).json({
         success: true,
